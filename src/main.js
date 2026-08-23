@@ -132,7 +132,9 @@ $('brief-form').addEventListener('submit', async (event) => {
   $('brief-error').hidden = true; 
   $('generate-status').textContent = 'Generating names...';
   project = updateBrief(project, brief, { tone:$('tone').value, extension:$('extension').value, maxAnnualPrice:Number($('budget').value) || 100 }); 
-  project = await generateCandidates(project); // Now async
+  project = await generateCandidates(project, { 
+    endpoint: 'http://localhost:3001/api/generate-names' 
+  }); // Now async
   persist(); 
   renderCandidates(); 
   showView('results'); 
