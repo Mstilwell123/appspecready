@@ -30,6 +30,8 @@ await test('founder can complete the naming workflow from brief to decision', as
   brief.value = 'A follow-up assistant for solo service businesses that organizes customer next steps.';
   brief.dispatchEvent(new window.Event('input', { bubbles: true }));
   document.querySelector('#brief-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
+  // Wait for async name generation to complete
+  await new Promise(resolve => setTimeout(resolve, 100));
   assert.equal(document.querySelector('#view-results').hidden, false);
   assert.equal(document.querySelectorAll('.candidate-card').length, 6);
   const usableCard = [...document.querySelectorAll('.candidate-card')].find(card => !card.querySelector('.mini-check.fail'));

@@ -121,7 +121,25 @@ function downloadReport() {
 }
 
 $('app-brief').addEventListener('input', updateCount);
-$('brief-form').addEventListener('submit', event => { event.preventDefault(); const brief = $('app-brief').value.trim(); if (brief.length < 12) { $('brief-error').hidden = false; $('app-brief').focus(); return; } $('brief-error').hidden = true; project = updateBrief(project, brief, { tone:$('tone').value, extension:$('extension').value, maxAnnualPrice:Number($('budget').value) || 100 }); project = generateCandidates(project); persist(); renderCandidates(); showView('results'); toast('Six candidate names generated from mock frontend data.'); });
+$('brief-form').addEventListener('submit', async (event) => { 
+  event.preventDefault(); 
+  const brief = $('app-brief').value.trim(); 
+  if (brief.length < 12) { 
+    $('brief-error').hidden = false; 
+    $('app-brief').focus(); 
+    return; 
+  } 
+  $('brief-error').hidden = true; 
+  $('generate-status').textContent = 'Generating names...';
+  project = updateBrief(project, brief, { tone:$('tone').value, extension:$('extension').value, maxAnnualPrice:Number($('budget').value) || 100 }); 
+  project = await generateCandidates(project); // Now async
+  persist(); 
+  renderCandidates(); 
+  showView('results'); 
+  const source = project.candidates[0]?.sourceProvider === 'mock' ? 'mock frontend data' : 'AI-generated names (Gemini)';
+  toast(`Names generated from ${source}.`); 
+  $('generate-status').textContent = '';
+});
 $('edit-brief').addEventListener('click', () => showView('brief'));
 $('back-results').addEventListener('click', () => { renderCandidates(); showView('results'); });
 $('change-selection').addEventListener('click', () => { renderCandidates(); showView('results'); });

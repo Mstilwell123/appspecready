@@ -71,11 +71,42 @@ export function updateBrief(project, brief, preferences = {}) {
   return p;
 }
 
-export function generateCandidates(project) {
+export async function generateCandidates(project, nameProvider = null) {
   if (project.brief.trim().length < 12) throw new Error('Describe the app in at least one meaningful sentence.');
   const p = clone(project);
-  const seed = [...p.brief].reduce((sum, char) => sum + char.charCodeAt(0), 0) % NAME_SETS.length;
-  p.candidates = NAME_SETS[seed].map((name, index) => makeCandidate(name, index, Number(p.preferences.maxAnnualPrice) || 100));
+  
+  let names = [];
+  let source = 'mock';
+  
+  // Try live provider first (Gemini via /api/generate-names)
+  if (nameProvider) {
+    try {
+      const response = await fetch(nameProvider.endpoint || '/api/generate-names', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brief: p.brief }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.names && Array.isArray(data.names)) {
+          names = data.names.map(n => n.name);
+          source = data.source || 'live-provider';
+        }
+      }
+    } catch (e) {
+      // Fall back to mock
+      console.warn('Name provider failed, using mock:', e.message);
+    }
+  }
+  
+  // Fall back to mock frontend generation
+  if (names.length === 0) {
+    const seed = [...p.brief].reduce((sum, char) => sum + char.charCodeAt(0), 0) % NAME_SETS.length;
+    names = NAME_SETS[seed];
+  }
+  
+  p.candidates = names.map((name, index) => makeCandidate(name, index, Number(p.preferences.maxAnnualPrice) || 100));
+  p.candidates.forEach(c => { c.sourceProvider = source; });
   p.selectedCandidateId = null;
   p.finalDecision = null;
   p.stage = 'results';
