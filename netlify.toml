@@ -1,4 +1,7 @@
 [build]
+# Repo root is the build base. Explicitly set here to override an invalid
+# base directory configured in the Netlify UI build settings.
+base = ""
 command = "npm ci && npm run build"
 publish = "dist"
 
