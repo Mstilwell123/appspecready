@@ -1,0 +1,141 @@
+import {
+  createNamingProject, updateBrief, generateCandidates, selectCandidate,
+  getRecommendation, candidateScore, canFinalize, finalizeSelection,
+  buildReport, resetProject, CHECK_KEYS
+} from './app_state.js';
+
+const STORAGE_KEY = 'appspecready.naming-project.v1';
+const CHECK_LABELS = { availability: 'Existing name usage', domain: 'Domain availability', affordability: 'Domain affordability', trademark: 'Trademark screen' };
+const $ = id => document.getElementById(id);
+const views = ['brief', 'results', 'compare', 'decision'];
+let project = createNamingProject();
+let activeFilter = 'all';
+let savedProject = loadSaved();
+
+function validSavedProject(value) {
+  return Boolean(value && value.version === 1 && ['brief','results','compare','decision'].includes(value.stage) && typeof value.brief === 'string' && value.preferences && Array.isArray(value.candidates));
+}
+function loadSaved() { try { const value = JSON.parse(localStorage.getItem(STORAGE_KEY)); return validSavedProject(value) ? value : null; } catch { return null; } }
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+    savedProject = structuredClone(project);
+    $('save-status').textContent = `Saved on this device · ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+  } catch {
+    $('save-status').textContent = 'Could not save on this device';
+    toast('This browser could not save the project. You can continue, but refresh will lose your work.');
+  }
+}
+function toast(message) { const el = $('toast'); el.textContent = message; el.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { el.hidden = true; }, 2600); }
+function icon(status) { return status === 'pass' ? '✓' : status === 'fail' ? '×' : '!'; }
+function safeText(el, text) { el.textContent = String(text ?? ''); }
+
+function showView(stage, { focus = true } = {}) {
+  views.forEach(name => { $(`view-${name}`).hidden = name !== stage; });
+  document.querySelectorAll('.step').forEach((step, index) => {
+    const stepStage = step.dataset.step;
+    const current = views.indexOf(stage);
+    step.classList.toggle('active', stepStage === stage);
+    step.classList.toggle('complete', index < current);
+    if (stepStage === stage) step.setAttribute('aria-current', 'step'); else step.removeAttribute('aria-current');
+    step.disabled = index > current || (stepStage === 'compare' && !project.selectedCandidateId) || (stepStage === 'decision' && !project.finalDecision);
+  });
+  project.stage = stage;
+  $('project-title').textContent = project.finalDecision?.name || project.brief.slice(0, 42) || 'New naming project';
+  document.querySelector('.sidebar').classList.remove('open');
+  $('menu-toggle').setAttribute('aria-expanded', 'false');
+  if (focus) { window.scrollTo({ top: 0, behavior: 'smooth' }); $('main').focus(); }
+}
+
+function renderCandidates() {
+  const recommended = getRecommendation(project);
+  let items = [...project.candidates];
+  if (activeFilter === 'clear') items = items.filter(c => Object.values(c.checks).every(x => x.status !== 'fail'));
+  if (activeFilter === 'review') items = items.filter(c => Object.values(c.checks).some(x => x.status === 'review' || x.status === 'fail'));
+  if ($('sort').value === 'az') items.sort((a,b) => a.name.localeCompare(b.name));
+  else items.sort((a,b) => candidateScore(b) - candidateScore(a));
+  const grid = $('candidate-grid'); grid.replaceChildren();
+  $('empty-results').hidden = items.length > 0;
+  items.forEach(candidate => {
+    const card = document.createElement('article');
+    card.className = `surface candidate-card${recommended?.id === candidate.id ? ' recommended' : ''}`;
+    const top = document.createElement('div'); top.className = 'card-top';
+    const info = document.createElement('div');
+    const name = document.createElement('h2'); name.className = 'candidate-name'; safeText(name, candidate.name);
+    const domain = document.createElement('div'); domain.className = 'candidate-domain'; safeText(domain, candidate.domain);
+    const rationale = document.createElement('p'); rationale.className = 'candidate-rationale'; safeText(rationale, candidate.rationale);
+    info.append(name, domain, rationale); top.append(info);
+    if (recommended?.id === candidate.id) { const badge = document.createElement('span'); badge.className = 'recommend-badge'; badge.textContent = 'Recommended'; top.append(badge); }
+    const checks = document.createElement('div'); checks.className = 'mini-checks';
+    CHECK_KEYS.forEach(key => {
+      const result = candidate.checks[key]; const row = document.createElement('div'); row.className = `mini-check ${result.status}`;
+      const mark = document.createElement('span'); mark.className = 'status-dot'; mark.textContent = icon(result.status);
+      const label = document.createElement('span'); label.textContent = CHECK_LABELS[key];
+      row.append(mark, label); checks.append(row);
+    });
+    const choose = document.createElement('button'); choose.className = 'secondary candidate-action'; choose.type = 'button'; choose.textContent = 'Review this name';
+    choose.addEventListener('click', () => { project = selectCandidate(project, candidate.id); persist(); renderCompare(); showView('compare'); });
+    card.append(top, checks, choose); grid.append(card);
+  });
+}
+
+function renderCompare() {
+  const candidate = project.candidates.find(c => c.id === project.selectedCandidateId); if (!candidate) return;
+  const recommended = getRecommendation(project);
+  safeText($('selected-name'), candidate.name); safeText($('selected-domain'), candidate.domain); safeText($('selected-rationale'), candidate.rationale);
+  $('selection-badge').textContent = candidate.id === recommended?.id ? 'Recommended candidate' : 'Selected candidate';
+  const list = $('check-list'); list.replaceChildren();
+  CHECK_KEYS.forEach(key => {
+    const result = candidate.checks[key]; const row = document.createElement('div'); row.className = `check-row ${result.status}`;
+    const mark = document.createElement('span'); mark.className = 'check-icon'; mark.textContent = icon(result.status);
+    const copy = document.createElement('div'); copy.className = 'check-copy';
+    const title = document.createElement('b'); title.textContent = CHECK_LABELS[key];
+    const label = document.createElement('span'); label.textContent = result.label;
+    const detail = document.createElement('small'); detail.textContent = result.detail;
+    copy.append(title, label, detail);
+    const source = document.createElement('span'); source.className = 'check-source'; source.textContent = `${result.source}\n${result.isMock ? 'Simulated' : 'Provider result'}`;
+    row.append(mark, copy, source); list.append(row);
+  });
+  const allowed = canFinalize(project); $('finalize-button').disabled = !allowed;
+  $('decision-guidance').textContent = allowed ? 'No check has failed. Review cautions, then record your decision if you are comfortable proceeding.' : 'This name has a failed check and cannot be finalized. Choose another candidate or re-check it with a live provider.';
+}
+
+function renderDecision() {
+  const report = buildReport(project);
+  ['final-name','report-name'].forEach(id => safeText($(id), report.name)); safeText($('report-domain'), report.domain);
+  safeText($('approved-date'), `Recorded ${new Date(report.approvedAt).toLocaleDateString()}`); safeText($('report-disclaimer'), report.disclaimer);
+  const dl = $('report-checks'); dl.replaceChildren();
+  report.checks.forEach(check => { const wrap = document.createElement('div'); const dt = document.createElement('dt'); dt.textContent = CHECK_LABELS[check.key]; const dd = document.createElement('dd'); dd.textContent = `${check.label} — ${check.detail} Source: ${check.source}${check.isMock ? ' (simulated result)' : ''}`; wrap.append(dt, dd); dl.append(wrap); });
+  $('report-mock-warning').hidden = !report.containsMockData;
+}
+
+function restoreProject(saved) {
+  project = structuredClone(saved); $('app-brief').value = project.brief || ''; $('tone').value = project.preferences?.tone || 'Clear and professional'; $('extension').value = project.preferences?.extension || 'Either .com or .ai'; $('budget').value = project.preferences?.maxAnnualPrice || 100; updateCount();
+  if (project.stage === 'results') renderCandidates(); if (project.stage === 'compare') { renderCandidates(); renderCompare(); } if (project.stage === 'decision') { renderCandidates(); renderDecision(); }
+  showView(project.stage || 'brief'); persist();
+}
+function updateCount() { $('char-count').textContent = `${$('app-brief').value.length} / 600`; }
+function downloadReport() {
+  const report = buildReport(project); const content = [`APPSPECREADY.AI — APP NAME DISCOVERY REPORT`,``,`App: ${report.brief}`,`Selected name: ${report.name}`,`Domain: ${report.domain}`,`Recorded: ${new Date(report.approvedAt).toLocaleString()}`,``,...report.checks.flatMap(c => [CHECK_LABELS[c.key].toUpperCase(),`${c.label}: ${c.detail}`,`Source: ${c.source}`,``]),`DISCLAIMER`,report.disclaimer].join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content], { type:'text/plain' })); a.download = `${report.name.replace(/[^a-z0-9]+/gi,'-')}-naming-report.txt`; a.click(); URL.revokeObjectURL(a.href);
+}
+
+$('app-brief').addEventListener('input', updateCount);
+$('brief-form').addEventListener('submit', event => { event.preventDefault(); const brief = $('app-brief').value.trim(); if (brief.length < 12) { $('brief-error').hidden = false; $('app-brief').focus(); return; } $('brief-error').hidden = true; project = updateBrief(project, brief, { tone:$('tone').value, extension:$('extension').value, maxAnnualPrice:Number($('budget').value) || 100 }); project = generateCandidates(project); persist(); renderCandidates(); showView('results'); toast('Six candidate names generated from mock frontend data.'); });
+$('edit-brief').addEventListener('click', () => showView('brief'));
+$('back-results').addEventListener('click', () => { renderCandidates(); showView('results'); });
+$('change-selection').addEventListener('click', () => { renderCandidates(); showView('results'); });
+$('finalize-button').addEventListener('click', () => { project = finalizeSelection(project); persist(); renderDecision(); showView('decision'); toast('Founder naming decision recorded.'); });
+$('print-report').addEventListener('click', () => window.print()); $('download-report').addEventListener('click', downloadReport);
+['new-project','reset-button'].forEach(id => $(id).addEventListener('click', () => { if (!confirm('Start over and remove the saved naming project from this device?')) return; project = resetProject(); try { localStorage.removeItem(STORAGE_KEY); } catch {} savedProject = null; $('resume-button').hidden = true; $('app-brief').value=''; updateCount(); showView('brief'); toast('Naming project cleared.'); }));
+$('resume-button').addEventListener('click', () => { restoreProject(savedProject); $('resume-button').hidden = true; toast('Saved naming project restored.'); });
+$('menu-toggle').addEventListener('click', () => { const side=document.querySelector('.sidebar'); const open=side.classList.toggle('open'); $('menu-toggle').setAttribute('aria-expanded',String(open)); });
+function renderFilterState() { document.querySelectorAll('.filter').forEach(button => { const active = button.dataset.filter === activeFilter; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); }); }
+document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => { activeFilter=button.dataset.filter; renderFilterState(); renderCandidates(); }));
+document.querySelector('[data-filter-reset]').addEventListener('click', () => { activeFilter='all'; renderFilterState(); renderCandidates(); });
+$('sort').addEventListener('change', renderCandidates);
+document.querySelectorAll('.step').forEach(step => step.addEventListener('click', () => { if (!step.disabled) { if (step.dataset.step==='results') renderCandidates(); if(step.dataset.step==='compare') renderCompare(); if(step.dataset.step==='decision') renderDecision(); showView(step.dataset.step); } }));
+
+updateCount(); showView('brief', { focus:false });
+renderFilterState();
+if (savedProject?.brief) $('resume-button').hidden = false;

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppSpecReady.ai — PRD v4</title>
+<style>
+  :root { --ink:#1a1a2e; --muted:#555; --accent:#3b5bdb; --bg:#f7f8fc; --card:#fff; --gate:#2f9e44; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:var(--bg); color:var(--ink); max-width:900px; margin:0 auto; padding:2rem; line-height:1.65; }
+  header { border-bottom:4px solid var(--accent); padding-bottom:1rem; margin-bottom:2rem; }
+  h1 { font-size:1.9rem; margin:0; }
+  h2 { color:var(--accent); border-bottom:1px solid #ddd; padding-bottom:.3rem; margin-top:2.5rem; }
+  h3 { color:var(--ink); }
+  .meta { color:var(--muted); font-size:.95rem; }
+  .badge { display:inline-block; background:var(--accent); color:#fff; border-radius:4px; padding:.1rem .5rem; font-size:.8rem; vertical-align:middle; }
+  .changed { background:#fff9db; border-left:4px solid #f59f00; padding:.6rem 1rem; margin:.8rem 0; }
+  .changed::before { content:"✏️ v2 CHANGE — "; font-weight:bold; color:#e67700; }
+  .goal { background:#e7f5ff; border-left:4px solid var(--accent); padding:.8rem 1.2rem; font-size:1.05rem; }
+  .gate { background:#ebfbee; border-left:4px solid var(--gate); padding:.5rem 1rem; margin:.5rem 0; }
+  blockquote { border-left:4px solid #ccc; margin:1rem 0; padding:.5rem 1.2rem; color:var(--muted); font-style:italic; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; }
+  th, td { border:1px solid #ddd; padding:.5rem .7rem; text-align:left; }
+  th { background:#f1f3f9; }
+  code { background:#eef0f6; padding:.1rem .35rem; border-radius:3px; font-size:.92em; }
+  footer { margin-top:3rem; padding-top:1rem; border-top:1px solid #ddd; color:var(--muted); font-size:.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AppSpecReady.ai — Product Requirements Document <span class="badge">v4</span></h1>
+  <p class="meta"><strong>Owner:</strong> Mark Stilwell, Pragvance.ai &nbsp;·&nbsp; <strong>Status:</strong> Approved product direction; Release 1 specification for Hermes planning<br>
+  <strong>Product type:</strong> Founder-facing build-readiness operating system &nbsp;·&nbsp; <strong>Primary downstream builder:</strong> Hermes agents</p>
+</header>
+
+<h2>1. Executive definition</h2>
+<p>App Builder is an AI-guided build-readiness application for nontechnical founders. It begins with a one-sentence app idea, investigates whether the opportunity deserves further investment, asks the product and technical questions the founder may not know to ask, exposes assumptions and contradictions, and compiles the approved decisions into a versioned, agent-ready Product Requirements Document (PRD) and Hermes Build Pack.</p>
+<p><strong>Core principle:</strong> One sentence should start an app — not specify one.<br>
+<strong>Core promise:</strong> Know what to build before paying an AI to build it.</p>
+
+<div class="changed goal">
+  <strong>The Goal (capital-G) — a defined product input.</strong>
+  The <strong>Goal</strong> is the founder's own one-sentence statement of what <em>their</em> app will accomplish and for whom — the founder's idea for the app, in their words. It is the <strong>first input App Builder captures</strong> and the anchor every later decision traces back to.
+  <br><br>
+  The Goal is treated as a <strong>Founder-Stated</strong> claim (see FR-RES-03): it is challenged, researched, and refined through the discovery process — never treated as a fixed specification. Stage 1 (Capture) opens by asking the founder to state the Goal of their app: what it will accomplish and who it serves. All extracted user / problem / outcome statements derive from that Goal.
+  <br><br>
+  <em>One sentence starts an app — it does not specify one.</em>
+</div>
+
+<h2>2. Problem</h2>
+<p>AI app builders can create convincing interfaces from a short prompt, but the missing product decisions do not disappear. When the founder has not defined the user, problem, business rules, data, permissions, edge cases, operating responsibilities, acceptance criteria, and commercial path, the builder silently guesses. The founder then pays through discarded work, repeated prompts, credit consumption, technical debt, unsafe defaults, and dependence on a walled garden. The intended user is not expected to know all the required questions. App Builder must supply the decision process, explain why each question matters, research what can be verified, preserve uncertainty, and prevent a polished document from disguising unresolved product risk.</p>
+
+<h2>3. Product boundary</h2>
+<p>App Builder owns opportunity discovery, validation planning, product decisions, first-release scope, requirements, acceptance criteria, approvals, and build-pack compilation. It does not generate production application code in Release 1. The Hermes App Builder skill is a separate execution system. It consumes the approved build pack, plans and implements bounded work, verifies results, and returns newly discovered product questions to App Builder. Hermes may recommend a product change but may not silently approve one.</p>
+<p>The separately sold App Builder Course teaches the judgment required to use the method. Course delivery is outside this application PRD.</p>
+
+<h2>4. Target user and first market</h2>
+<h3>Primary user</h3>
+<p>A nontechnical or lightly technical solo founder planning a web-based Software as a Service (SaaS) application before spending substantial time, money, tokens, or builder credits.</p>
+<h3>First-release product category</h3>
+<p>Relatively straightforward responsive web SaaS applications. Release 1 does not claim full readiness for medical diagnosis, financial decision-making, children's products, crypto custody, complex marketplaces, hardware-dependent products, or heavily regulated enterprise systems.</p>
+<h3>Primary job to be done</h3>
+<blockquote>When I have an app idea but do not know the decisions required to build it, help me evaluate the opportunity, challenge weak assumptions, define the right first release, and produce a trustworthy plan that Hermes can execute without inventing foundational product decisions.</blockquote>
+
+<h2>5. Product principles</h2>
+<ul>
+  <li><strong>P-01 — One decision at a time.</strong> The experience is conversational and adaptive, not a giant static form.</li>
+  <li><strong>P-02 — Voice first, never voice only.</strong> Every interview answer can be spoken or typed, reviewed, corrected, and explicitly approved.</li>
+  <li><strong>P-03 — Evidence before confidence.</strong> Facts, observations, inferences, assumptions, unknowns, conflicts, and owner decisions remain visibly distinct.</li>
+  <li><strong>P-04 — Challenge before polish.</strong> The system tests vague, broad, contradictory, unsupported, unsafe, or uneconomic claims before generating final prose.</li>
+  <li><strong>P-05 — The founder owns consequential decisions.</strong> The model recommends; deterministic rules control required fields, states, gates, approvals, and versions.</li>
+  <li><strong>P-06 — A changed decision shows downstream impact.</strong> PRD sections are compiled from structured state, not summarized from the latest chat.</li>
+  <li><strong>P-07 — Portable ownership.</strong> Users can export human-readable and machine-readable artifacts without remaining inside App Builder.</li>
+  <li><strong>P-08 — No fake certainty.</strong> A high score cannot conceal a critical blocker, and the product never guarantees viability or a perfect PRD.</li>
+</ul>
+
+<div class="changed">
+  <strong>P-09 — The founder owns the plan.</strong> App Builder produces a plan; the founder is responsible for its decisions. This disclaimer is shown visibly before any build-pack export or handoff to an AI agent.
+</div>
+<h2>6. End-to-end user journey</h2>
+
+<h3>Stage 1 — Capture</h3>
+<div class="changed">The interview opens by asking the founder to state the <strong>Goal</strong> of their app — what it will accomplish and who it serves (see §1). The founder may speak or type it.</div>
+<p>The founder creates a project and explains the idea by voice or text. App Builder extracts proposed statements for the user, problem, desired outcome, product type, inspiration, constraints, and current beliefs — derived from the stated Goal. The founder confirms, edits, rejects, or marks each statement unknown.</p>
+<div class="gate"><strong>Gate G1:</strong> A specific user, triggering situation, problem, desired outcome, founder goal, and material constraints are understandable and owner-approved.</div>
+
+<h3>Stage 1b — Name check <span class="badge">v4 NEW</span></h3>
+<div class="changed">
+<p>Before the PRD is compiled, the founder must choose an app name that passes four checks:</p>
+<ol>
+  <li><strong>Available</strong> — the name (and a usable domain) is not already taken.</li>
+  <li><strong>Not taken</strong> — no existing product or company is operating under it in software.</li>
+  <li><strong>Affordable</strong> — the domain is purchasable at a normal registration price, not a premium/resale price.</li>
+  <li><strong>Not trademarked</strong> — no registered trademark conflicts in software categories.</li>
+</ol>
+</div>
+<div class="gate"><strong>Gate G1b:</strong> A name passing all four checks is founder-approved and recorded as a Decision. The compiled PRD and build pack use only the approved name.</div>
+<div class="changed"><strong>✅ This product's approved name (2026-08-23): AppSpecReady.ai.</strong> Passed all four checks: domains available (.ai/.com/.io unregistered at registry), no existing software product under the name, standard (non-premium) pricing, no USPTO software-category trademark conflict found. (Caution note: unrelated "SpecReady" uses exist in construction/lighting industries — no conflict.) Domain appspecready.ai purchased by founder — name decision COMPLETE.</div>
+
+<h3>Stage 2 — Problem discovery</h3>
+<p>App Builder explores current behavior, frequency, severity, consequences, alternatives, spending, user versus payer, switching conditions, and why doing nothing may remain preferable.</p>
+<div class="gate"><strong>Gate G2:</strong> The problem is defined through a specific person, situation, current behavior, consequence, and measurable desired outcome.</div>
+
+<h3>Stage 3 — Research and viability</h3>
+<p>App Builder researches direct competitors, substitutes, manual workarounds, pricing, complaints, abandoned products, demand signals, distribution difficulty, technical dependencies, likely cost drivers, trust constraints, and evidence opposing the idea. Each claim preserves its source, retrieval date, limitation, evidence state, and relationship to the verdict. The verdict is Proceed, Proceed with Conditions, Reshape, Pause, or Stop. The user may override a recommendation, but the override and rationale are recorded.</p>
+<div class="gate"><strong>Gate G3:</strong> The founder reviews supporting evidence, opposing evidence, missing evidence, critical assumptions, confidence limits, and what would change the verdict.</div>
+
+<h3>Stage 4 — Validation plan</h3>
+<p>When real-world proof is required, App Builder creates the smallest appropriate test: behavior-focused interviews, a landing-page or fake-door test, concierge test, pilot, deposit, preorder, or another bounded experiment. It defines participant criteria, evidence threshold, deadline, and decision rule.</p>
+<div class="gate"><strong>Gate G4:</strong> Required validation evidence is attached or recorded, or the founder explicitly accepts the unvalidated assumption as a blocking or approved risk.</div>
+
+<h3>Stage 5 — Product strategy</h3>
+<p>The system helps approve the product promise, primary user, first-value moment, narrow wedge, differentiation, why-now case, business model, pricing hypothesis, acquisition hypothesis, success measures, and explicit non-goals.</p>
+<div class="gate"><strong>Gate G5:</strong> One initial audience, one core problem, one principal outcome, and one narrow first-release wedge are approved.</div>
+
+<h3>Stage 6 — Experience and operational discovery</h3>
+<p>App Builder maps entry, account creation, onboarding, first success, recurring use, payments, cancellation, failures, recovery, notifications, support, administration, export, and deletion. It discovers roles, permissions, tenant boundaries, data, integrations, artificial intelligence behavior, approvals, privacy, security, accessibility, analytics, backup, and operating responsibilities.</p>
+<div class="gate"><strong>Gate G6:</strong> Every critical journey has a beginning, successful outcome, failure behavior, recovery path, data and permission implications, and responsible owner.</div>
+
+<h3>Stage 6b — Dependency and vendor discovery <span class="badge">v3 NEW</span></h3>
+<div class="changed">
+<p><strong>Purpose:</strong> The founder should know — before any building begins — every third-party service their app will depend on, what the options are, and how locked in each option leaves them. This directly counters the walled-garden pattern (e.g., a builder that hosts the app <em>and</em> stores the data, so leaving means rebuilding both).</p>
+<p>For every capability discovered in Stages 1–6 that requires a third-party service (payments, SMS, email, transcription, social publishing, video, calendars, storage, hosting, AI models, etc.), App Builder:</p>
+<ul>
+  <li><strong>Identifies the vendor category</strong> as soon as the triggering capability is stated (e.g., "monthly subscription" → payments; "posts to social accounts" → social API publisher).</li>
+  <li><strong>Researches 2–3 candidate vendors per category</strong> using the Stage 3 evidence machinery — each candidate recorded as an Evidence record with source, retrieval date, and limitations.</li>
+  <li><strong>Presents each candidate with plain-language trade-offs:</strong> pricing model, lock-in/portability rating, data-export ability, region/compliance fit, and integration maturity.</li>
+  <li><strong>Flags walled-garden risk explicitly</strong> whenever one vendor would control multiple layers (e.g., hosting + database + auth), and always names a portable alternative.</li>
+</ul>
+<p>The founder approves one vendor per category, or consciously defers it as an open decision with options attached. Vendor selection is an owner decision (P-05) — the model recommends, the founder decides.</p>
+</div>
+<div class="gate"><strong>Gate G6b:</strong> Every required third-party dependency is either founder-approved or listed as an explicit open decision with researched options attached — and every recommendation carries a plain-language lock-in rating, including any vendor controlling both hosting and data.</div>
+
+<h3>Stage 7 — First-release scope</h3>
+<p>Every proposed capability is classified as required for the first valuable outcome, required for safety or operations, later, or excluded. Every included requirement receives a stable identifier, user, trigger, required behavior, business rule, failure behavior, priority, dependency, risk, acceptance criterion, verification method, and approver.</p>
+<div class="gate"><strong>Gate G7:</strong> The Minimum Viable Product (MVP) has a complete happy path, necessary failure paths, essential operating controls, and no unresolved critical dependency.</div>
+
+<h3>Stage 8 — Readiness audit and approval</h3>
+<p>The system audits missing answers, contradictions, undefined terms, duplicated requirements, unsupported claims, scope creep, journey coverage, permission coverage, data lifecycle, acceptance coverage, cost risk, and build sequence. It presents conflicts for owner resolution rather than silently choosing.</p>
+<div class="gate"><strong>Gate G8:</strong> Critical blockers are zero, high-severity conflicts are resolved, lower risks are visible, and the founder approves the product promise, scope, costs, exclusions, risks, and open assumptions.</div>
+
+<h3>Stage 9 — Compile and export</h3>
+<p>App Builder compiles a synchronized PRD, evidence ledger, decision history, assumption and risk register, validation record, user journeys, data and permission specification, acceptance plan, roadmap, and Hermes Build Brief. The build pack receives a version and immutable approval record.</p>
+<div class="changed">Before any export or handoff, the app displays the founder-responsibility disclaimer (P-09): <em>"App Builder produces a plan; the founder is responsible for its decisions."</em> The founder must acknowledge it as part of export approval.</div>
+<div class="gate"><strong>Gate G9:</strong> The exported pack passes schema validation, contains no unresolved critical blocker, and can be reviewed by Hermes without reopening foundational product decisions. <strong>Export is blocked until the founder explicitly approves the compiled PRD and build pack — this approval is the only human gate; no third-party review exists in the product.</strong></div>
+
+<h2>7. Adaptive interview requirements</h2>
+<ul>
+  <li><strong>FR-INT-01</strong> — Ask one high-value question at a time and explain in plain language why it matters.</li>
+  <li><strong>FR-INT-02</strong> — Maintain universal, product-type, business-model, feature-triggered, risk-triggered, contradiction-resolution, and readiness-audit question layers.</li>
+  <li><strong>FR-INT-03</strong> — Select the next question in this order: critical blocker, high-risk assumption, contradiction, then highest-value unanswered domain.</li>
+  <li><strong>FR-INT-04</strong> — Accept "I do not know" and create an unknown, research task, or owner decision; never fabricate an answer.</li>
+  <li><strong>FR-INT-05</strong> — Define unfamiliar terms and abbreviations on first use and provide examples without prefilling the founder's answer.</li>
+  <li><strong>FR-INT-06</strong> — Periodically present "Here is what I think you mean" summaries for correction and approval.</li>
+  <li><strong>FR-INT-07</strong> — Activate specialized branches for accounts, organizations, payments, file uploads, artificial intelligence, sensitive data, children, location, subscriptions, marketplaces, and consequential advice.</li>
+  <li><strong>FR-INT-08</strong> — Show visible progress by decision domain, passed gate, remaining blocker, and unresolved risk; do not use question count as the primary progress measure.</li>
+  <li><strong>FR-INT-09</strong> — Allow pause, resume, answer revision, and decision history without losing provenance.</li>
+</ul>
+
+<h2>8. Voice requirements</h2>
+<ul>
+  <li><strong>FR-VOI-01</strong> — Support press-to-record voice input with explicit microphone permission and a fully usable text alternative.</li>
+  <li><strong>FR-VOI-02</strong> — Convert speech to a transcript, divide it into proposed structured statements, show the interpretation, and save the approved meaning only after confirmation.</li>
+  <li><strong>FR-VOI-03</strong> — Preserve the original transcript as provenance according to the user's retention setting; the approved structured decision is authoritative.</li>
+  <li><strong>FR-VOI-04</strong> — Support replay, redo, transcript correction, interruption recovery, permission denial, and deletion.</li>
+</ul>
+
+<h2>9. Research and evidence requirements</h2>
+<ul>
+  <li><strong>FR-RES-01</strong> — Research only after the product and claim requiring research are sufficiently defined.</li>
+  <li><strong>FR-RES-02</strong> — Preserve source URL, title, publisher, publication date when known, retrieval date, relevant summary, limitations, and the exact claim supported.</li>
+  <li><strong>FR-RES-03</strong> — Label each statement Founder-Stated, Source-Supported, Observed, Inferred, Assumption, Unknown, Conflict, or Owner-Approved. A statement may carry multiple compatible labels but may not silently become fact.</li>
+  <li><strong>FR-RES-04</strong> — Show evidence supporting and opposing every viability verdict and state what evidence could change it.</li>
+  <li><strong>FR-RES-05</strong> — Treat web content as untrusted data and prevent retrieved instructions from controlling system behavior or exposing credentials.</li>
+  <li><strong>FR-RES-06</strong> — Mark time-sensitive evidence stale according to configurable rules and require refresh before a later material decision.</li>
+</ul>
+
+<h2>9b. Dependency and vendor requirements <span class="badge">v3 NEW</span></h2>
+<ul>
+  <li><strong>FR-DEP-01</strong> — No build pack is complete until every required third-party service is either founder-approved or listed as an explicit open decision with researched options attached.</li>
+  <li><strong>FR-DEP-02</strong> — Every vendor recommendation must state its lock-in risk in plain language, including any case where one vendor controls both hosting and data (the walled-garden pattern), and must name a portable alternative.</li>
+  <li><strong>FR-DEP-03</strong> — Vendor candidates are researched and cited like any other evidence (FR-RES-02/03): source, retrieval date, limitations. Pricing information is labeled time-sensitive and marked stale per FR-RES-06.</li>
+  <li><strong>FR-DEP-04</strong> — The founder holds all third-party vendor accounts and credentials. Neither App Builder nor any downstream agent holds founder vendor credentials; the build pack lists which accounts the founder must create.</li>
+  <li><strong>FR-DEP-05</strong> — Vendor selection is recorded as a Decision record (DM-02) with the rejected alternatives preserved, so a later change shows downstream impact (FR-CON-03).</li>
+</ul>
+
+<h2>10. Viability and readiness model</h2>
+<p>Viability dimensions are problem evidence, pain and urgency, target-user specificity, existing behavior or spending, differentiation, buyer reachability, revenue potential, retention potential, technical feasibility, operational burden, legal/privacy/safety exposure, and founder advantage.</p>
+<ul>
+  <li><strong>FR-VIA-01</strong> — Store each dimension's criteria, inputs, score, weight, evidence, confidence, and rationale. The interface must expose how the result was calculated.</li>
+  <li><strong>FR-VIA-02</strong> — Use scenarios for potential: conservative, plausible, and optimistic, with assumptions, distribution path, pricing hypothesis, cost-to-serve estimate, and failure conditions.</li>
+  <li><strong>FR-VIA-03</strong> — Never treat a score as predicted success. No aggregate score can override an undefined primary user, missing validation requirement, unresolved critical security issue, or other critical blocker.</li>
+</ul>
+<p>Readiness domains and weights: problem and user 15%, evidence and viability 15%, value and differentiation 10%, journeys 10%, scope and requirements 15%, data/roles/security 10%, AI and integrations 5%, business economics 5%, acceptance and verification 10%, and operations 5%. Each domain is rated from 0 (unanswered) to 4 (evidence-supported and verifiable). Overall readiness is the weighted sum, but "Handoff Candidate" additionally requires zero critical blockers.</p>
+<h2>11. Decision graph and data model</h2>
+<ul>
+  <li><strong>DM-01 Project:</strong> owner, name, status, product category, current stage, risk tier, active build-pack version, timestamps.</li>
+  <li><strong>DM-02 Decision:</strong> stable ID, domain, question, raw answer, system interpretation, approved answer, state, confidence, owner, approval time, version, change reason.</li>
+  <li><strong>DM-03 Evidence:</strong> source type, source reference, date, excerpt or observation, supported claim, limitation, confidence, staleness.</li>
+  <li><strong>DM-04 Relationship:</strong> supports, opposes, depends on, conflicts with, supersedes, affects, or verifies.</li>
+  <li><strong>DM-05 Requirement:</strong> stable ID, user, trigger, behavior, rule, failure behavior, release, priority, dependencies, risks, acceptance criteria, verifier type, approver.</li>
+  <li><strong>DM-06 Journey:</strong> actor, entry, steps, first value, successful end, empty state, failure, recovery, data, permissions, linked requirements.</li>
+  <li><strong>DM-07 Validation Experiment:</strong> hypothesis, method, participants, threshold, deadline, evidence, result, decision.</li>
+  <li><strong>DM-08 Build Pack:</strong> project version, approved decision IDs, artifact versions, readiness result, unresolved noncritical risks, approval record, export checksum.</li>
+  <li><strong>DM-09 Vendor Dependency: <span class="badge">v3 NEW</span></strong> stable ID, category, triggering capability/requirement IDs, candidate vendors (each with evidence refs, pricing model, lock-in rating, portability notes), selected vendor or deferred-open state, accounts the founder must create, approver.</li>
+</ul>
+<p>Decision states are Unasked, Asked, Partial, Proposed, Needs Evidence, Assumption, Unknown, Conflict, Approved, Deferred, Rejected, and Superseded. State transitions and approval rules are deterministic and auditable.</p>
+
+<h2>12. Consistency and compilation</h2>
+<ul>
+  <li><strong>FR-CON-01</strong> — Detect logical conflicts such as anonymous use versus private cross-device history, one-time pricing versus recurring AI cost, full automation versus mandatory approval, and narrow MVP versus a large required feature inventory.</li>
+  <li><strong>FR-CON-02</strong> — Show the conflicting statements, explain the consequences in plain language, offer feasible resolution patterns, and require an owner decision.</li>
+  <li><strong>FR-CON-03</strong> — When a decision changes, identify affected journeys, requirements, risks, evidence claims, cost assumptions, tests, and build-pack sections before recompilation.</li>
+  <li><strong>FR-COM-01</strong> — Compile documents from approved structured records, not from a free-form conversation summary.</li>
+  <li><strong>FR-COM-02</strong> — Produce both human-readable Google Docs and a machine-readable structured export. Release 1 also permits copy and download; direct Hermes transmission is later.</li>
+</ul>
+
+<h2>13. Required build-pack contents</h2>
+<p>The Hermes Build Pack contains an executive product brief, market and evidence brief, viability verdict, validation record, approved PRD, goals and non-goals, user journeys, role and permission matrix, data model, integration contracts, <strong>dependency and vendor register (v3: every third-party service, the approved vendor or open options, lock-in ratings, and accounts the founder must create)</strong>, AI behavior specification, security/privacy/accessibility requirements, failure and recovery behavior, MVP scope, deferred roadmap, requirements and acceptance criteria, verification plan, architecture recommendation, implementation sequence, assumption and risk register, decision history, source register, open noncritical questions, and explicit Hermes instructions. Every build-pack requirement must be traceable to an approved decision or visible risk. Every release blocker must be traceable to a verification method.</p>
+
+<h2>14. Hermes (or other AI Agent) handoff contract</h2>
+<ul>
+  <li><strong>HC-01</strong> — Hermes receives only a versioned, owner-approved build pack.</li>
+  <li><strong>HC-02</strong> — Hermes validates required artifacts and reports missing or contradictory information before implementation.</li>
+  <li><strong>HC-03</strong> — Hermes may select implementation details within approved architecture boundaries but may not change the user, product promise, business rules, release scope, consequential AI permissions, or acceptance criteria without owner approval.</li>
+  <li><strong>HC-04</strong> — A discovered constraint returns as a change request containing affected requirement IDs, evidence, options, cost and risk implications, recommendation, and required owner decision.</li>
+  <li><strong>HC-05</strong> — An approved change creates updated decision records, affected requirements, a new build-pack version, and a new Hermes authorization.</li>
+</ul>
+
+<h2>15. Security, privacy, and trust</h2>
+<ul>
+  <li><strong>SEC-01</strong> — Keep model, research, transcription, storage, and integration credentials server-side. Never expose secrets through browser-public environment variables.</li>
+  <li><strong>SEC-02</strong> — Isolate each user's projects and build packs using database Row-Level Security (RLS) plus server authorization. Test isolation with two real accounts.</li>
+  <li><strong>SEC-03</strong> — Encrypt transport, restrict privileged operations, validate uploads and inputs, rate-limit abuse-sensitive endpoints, and maintain audit logs for approvals, exports, and consequential changes.</li>
+  <li><strong>SEC-04</strong> — Provide export, correction, project deletion, account deletion, transcript-retention controls, and documented backup-retention behavior.</li>
+  <li><strong>SEC-05</strong> — Do not train shared models on private project content without explicit, revocable consent.</li>
+  <li><strong>SEC-06</strong> — Treat unpublished ideas and customer data as confidential. Show project visibility and sharing state clearly.</li>
+  <li><strong>SEC-07</strong> — Require elevated review paths for health, legal, financial, children, employment, faith, or other sensitive contexts. Do not claim professional certification.</li>
+  <li><strong>SEC-08</strong> — Log evidence provenance and model-generated recommendations while avoiding sensitive content in operational logs.</li>
+</ul>
+
+<h2>16. Universal app foundation</h2>
+<ul>
+  <li><strong>PLAT-01</strong> — Release 1 is a responsive web application supporting desktop and mobile widths, keyboard, mouse, touch, orientation changes, safe areas, accessible focus, and loading, empty, offline, permission-denied, and failure states.</li>
+  <li><strong>PLAT-02</strong> — Release 1 is an installable PWA with a valid manifest, icons, deliberate update behavior, and an offline fallback. Private project data must not be indiscriminately cached.</li>
+  <li><strong>PLAT-03</strong> — Isolate microphone, files, notifications, sharing, secure storage, and future device capabilities behind platform adapters.</li>
+  <li><strong>PLAT-04</strong> — Preserve a documented route to later iOS and Android packaging. Native wrappers, signing, store metadata, physical-device testing, submission, and store approval are not part of Release 1.</li>
+</ul>
+
+<h2>17. Accessibility and usability</h2>
+<ul>
+  <li><strong>A11Y-01</strong> — Meet WCAG 2.2 AA for Release 1 flows.</li>
+  <li><strong>A11Y-02</strong> — Voice is never the only input or review path. All recording controls have keyboard and screen-reader equivalents.</li>
+  <li><strong>A11Y-03</strong> — Use large readable type, sufficient contrast, visible focus, clear status text, error recovery, and plain-language definitions.</li>
+  <li><strong>A11Y-04</strong> — Progress and evidence states cannot rely on color alone.</li>
+</ul>
+
+<h2>18. Nonfunctional requirements</h2>
+<ul>
+  <li><strong>NFR-01</strong> — Autosave approved and draft state without losing provenance; support safe resume after interruption.</li>
+  <li><strong>NFR-02</strong> — A failed model or research request must not corrupt approved decisions. Retry safely and preserve the last confirmed state.</li>
+  <li><strong>NFR-03</strong> — Common interface actions should respond within 300 milliseconds excluding network-dependent AI and research work; long work shows progress and can be resumed.</li>
+  <li><strong>NFR-04</strong> — Maintain immutable approval and version history for exported build packs.</li>
+  <li><strong>NFR-05</strong> — Use provider-replaceable service boundaries for language models, transcription, research, storage, authentication, and document export.</li>
+  <li><strong>NFR-06</strong> — Record model/provider, prompt or policy version, and output provenance for consequential recommendations without exposing hidden secrets.</li>
+</ul>
+<h2>19. Release 1 scope</h2>
+<p>Release 1 includes one user, one project at a time, text-first adaptive interviewing, optional voice capture, one initial web-SaaS question domain, sourced competitor/problem research, transparent verdict, validation plan, structured decision graph, evidence and assumption labels, contradiction detection, section approvals, MVP scoping, requirements with acceptance criteria, readiness audit, Google Docs PRD generation, machine-readable export, Hermes Build Brief, version history, and <span class="changed" style="display:inline">founder approval of the compiled PRD and build pack before any export or agent handoff (enforced by Gate G9; the app blocks export until the owner approves)</span>.</p>
+
+<h3>Explicitly deferred</h3>
+<p>Direct code generation, support for every product category, automatic legal compliance certification, native app-store packaging, large-team collaboration, marketplace templates, full visual design generation, autonomous architecture approval, direct unsupervised Hermes execution, public startup scoring, course delivery, and community features.</p>
+
+<h2>20. Success measures</h2>
+<p><strong>Primary measure:</strong> Percentage of approved build packs that Hermes can begin implementing without reopening foundational product decisions.</p>
+<p><strong>Supporting measures:</strong> time to approved build pack; founder completion by gate; material unknowns and contradictions discovered; percentage of Proceed, Conditional, Reshape, Pause, and Stop verdicts; foundational clarification questions from Hermes; omission-driven requirement changes; avoidable build cycles; defects traced to ambiguous requirements; first-pass acceptance results; measurable compute or credit use; percentage reaching a real-user test; and percentage reaching a paying-customer test.</p>
+<p><strong>Trust measures:</strong> research citation coverage, unsupported-claim rate, assumptions explicitly labeled, founder correction rate, verdict changes after new evidence, unauthorized cross-project access attempts blocked, and privacy/security incidents.</p>
+
+<h2>21. Release 1 acceptance criteria</h2>
+<ul>
+  <li><strong>AC-01</strong> — A founder can create, pause, resume, edit, and delete one project.</li>
+  <li><strong>AC-02</strong> — The founder can submit the initial idea (the Goal) by text or voice and approve structured extracted statements.</li>
+  <li><strong>AC-03</strong> — The interview branches based on at least accounts, organizations, subscriptions, AI behavior, file uploads, and sensitive-data triggers.</li>
+  <li><strong>AC-04</strong> — The system records evidence, assumptions, unknowns, conflicts, decisions, requirements, relationships, and versions as structured records.</li>
+  <li><strong>AC-05</strong> — The system produces a cited viability brief with supporting, opposing, and missing evidence plus one allowed verdict.</li>
+  <li><strong>AC-06</strong> — At least ten defined contradiction rules are tested, and the system never silently resolves a high-severity conflict.</li>
+  <li><strong>AC-07</strong> — No build pack can be approved with an unresolved critical blocker.</li>
+  <li><strong>AC-08</strong> — Every included release requirement has an ID, behavior, failure behavior, acceptance criterion, verifier type, and approval state.</li>
+  <li><strong>AC-09</strong> — Changing an approved upstream decision displays affected downstream records before recompilation.</li>
+  <li><strong>AC-10</strong> — The system generates a readable Google Docs PRD and machine-readable build pack from the same approved records.</li>
+  <li><strong>AC-11</strong> — A second authenticated user cannot read, modify, export, or delete the first user's project.</li>
+  <li><strong>AC-12</strong> — The responsive web and PWA builds pass keyboard, touch, offline-fallback, and core accessibility checks.</li>
+  <li><strong>AC-13</strong> — Hermes can parse the build pack, identify scope and blockers, and produce an implementation plan without inventing a foundational product decision in at least five pilot handoffs.</li>
+  <li><strong>AC-14 <span class="badge">v3 NEW</span></strong> — Given a capability requiring a third-party service, the system identifies the vendor category, presents at least two researched vendor options with lock-in ratings and plain-language trade-offs (flagging any hosting+data walled-garden vendor), and records the founder's approval or deferral. A build pack cannot pass Gate G6b with an unexamined dependency.</li>
+</ul>
+
+<h2>22. Architecture — LOCKED</h2>
+<div class="changed">
+<strong>Locked stack decision (owner-approved, replaces the previous "recommended boundaries"):</strong>
+<ul>
+  <li><strong>Front end:</strong> Responsive web PWA hosted on <strong>Netlify</strong>.</li>
+  <li><strong>Database:</strong> A <strong>brand-new, dedicated Supabase project</strong> (PostgreSQL) — no reuse of any existing project. Row-Level Security on every user-data table (SEC-02).</li>
+  <li><strong>Server logic:</strong> <strong>Supabase Edge Functions</strong> for the application/API layer, research jobs, and document compilation.</li>
+  <li><strong>Secrets:</strong> All model, transcription, research, and integration credentials live in Edge Function secrets, server-side only — never in Netlify/browser environment variables (SEC-01).</li>
+  <li><strong>Provider adapters:</strong> LLM, transcription, research, storage, and document export sit behind thin provider-adapter interfaces from day one (NFR-05), so swapping providers is a config change, not a rewrite.</li>
+  <li><strong>Storage:</strong> Supabase Storage for approved attachments and recordings.</li>
+  <li><strong>Audit:</strong> Append-only tables for approvals, versions, and build-pack export records (NFR-04).</li>
+</ul>
+</div>
+<p>The decision graph and deterministic gate engine are the source of truth. Language models assist conversation, extraction, research synthesis, contradiction proposals, and document prose; they do not directly mutate approved state without validated commands and user approval.</p>
+
+<h2>23. Hermes implementation sequence</h2>
+<table>
+  <tr><th>Milestone</th><th>Contents</th></tr>
+  <tr><td><strong>1 — Foundation</strong></td><td>Authentication, project shell, responsive navigation, data isolation (RLS), audit/version primitives, PWA foundation.</td></tr>
+  <tr><td><strong>2 — Decision engine</strong></td><td>Decision/evidence/relationship schemas, states, approvals, history, progress, gate framework.</td></tr>
+  <tr><td><strong>3 — Interview</strong></td><td>Text workflow, adaptive question selection, summaries, branching rules, pause/resume.</td></tr>
+  <tr><td><strong>4 — Voice</strong></td><td>Recording, transcription, statement extraction, correction, retention, accessibility fallback.</td></tr>
+  <tr><td><strong>5 — Research, viability and vendors</strong></td><td>Research jobs, evidence ledger, transparent dimensions, verdict workflow, validation plan, vendor-dependency discovery and lock-in ratings (Stage 6b, FR-DEP).</td></tr>
+  <tr><td><strong>6 — Product definition</strong></td><td>Journeys, scope classification, requirements, acceptance criteria, contradiction and dependency impact.</td></tr>
+  <tr><td><strong>7 — Compiler</strong></td><td>Readiness audit, section approvals, Google Docs PRD, machine-readable pack, Hermes brief, immutable version.</td></tr>
+  <tr><td><strong>8 — Pilot hardening</strong></td><td>Five to ten founder-to-Hermes handoffs, isolation and security testing, accessibility review, performance, failure recovery, measured rework analysis.</td></tr>
+</table>
+
+<h2>24. Owner approval boundaries</h2>
+<p>Hermes must obtain owner approval before changing the primary user, product promise, viability verdict, required validation threshold, MVP scope, pricing model, consequential AI authority, data sensitivity classification, security boundary, external integration with material cost, acceptance criteria, or release authorization.</p>
+
+<h2>25. Open product decisions</h2>
+<div class="changed">"Pragvance review workflow" removed — no third-party review exists in the product; the founder is the sole approver (see §19 and Gate G9).</div>
+<p>Remaining open decisions for owner review: the final public name (resolved via Stage 1b name check before compile), exact Release 1 pricing, whether pilot users pay, preferred model and research providers, transcript default-retention period, initial question-domain size, Google Drive folder organization, and the precise structured build-pack schema version.</p>
+
+<h2>26. Validation mandate</h2>
+<p>Before broad development, implement and test one complete vertical slice: one founder proposes one web-SaaS idea, App Builder interviews and researches it, identifies at least one meaningful uncertainty or contradiction, the founder resolves or accepts it, the system produces a versioned PRD and Hermes brief, and Hermes evaluates the handoff. Run five to ten founder-to-Hermes handoffs. The concept is validated only if App Builder materially reduces unresolved product decisions, avoidable clarification, rework, and wasted AI-builder effort compared with the founder's original brief.</p>
+
+<footer>
+  <p><strong>v4 changes from v3:</strong> (7) Stage 1b — Name check: before the PRD is compiled, the founder chooses an app name passing four checks — available, not taken, affordable domain, not trademarked. Gate G1b records the approved name; the PRD and build pack use only the approved name.</p>
+  <p><strong>v3 changes from v2:</strong> (5) New Stage 6b — Dependency and vendor discovery: the app identifies every third-party service the founder's app will need, researches 2–3 vendors per category with pricing models, lock-in/portability ratings, and plain-language trade-offs, and explicitly flags walled-garden vendors (one vendor controlling hosting + data). (6) New requirements FR-DEP-01–05, Gate G6b, data model DM-09 (Vendor Dependency), acceptance test AC-14, and a "dependency and vendor register" added to the build pack (§13). Founder holds all vendor accounts/credentials; vendor choice is an owner decision.</p>
+  <p><strong>v2 changes from v1:</strong> (1) "Goal (capital-G)" defined as the founder's one-sentence statement of what their app will accomplish — the first captured input (§1, Stage 1, AC-02). (2) New principle P-09: "App Builder produces a plan; the founder is responsible for its decisions" — shown before export (§5, Stage 9). (3) Pragvance review removed entirely — the founder is the sole approver via Gate G9 (§19, §25). (4) Architecture locked: new dedicated Supabase project + Netlify PWA + Edge Functions, keys server-side only (§22).</p>
+  <p>Generated from the approved v1 PRD with owner-directed amendments. AppSpecReady · Pragvance.ai</p>
+</footer>
+</body>
+</html>

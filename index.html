@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#14213d">
+  <meta name="description" content="Discover and evaluate an app name with availability, domain, affordability, and trademark screening.">
+  <title>AppSpecReady.ai — App Name Discovery</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<div id="app-shell">
+  <aside class="sidebar" aria-label="Naming workflow">
+    <a class="brand" href="#" aria-label="AppSpecReady.ai home">AppSpecReady<span>.ai</span></a>
+    <p class="brand-copy">Find an app name you can actually use.</p>
+    <nav class="steps" aria-label="Progress">
+      <button class="step active" data-step="brief"><span>1</span><b>Describe the app</b><small>Tell us what it does</small></button>
+      <button class="step" data-step="results" disabled><span>2</span><b>Review names</b><small>Compare recommendations</small></button>
+      <button class="step" data-step="compare" disabled><span>3</span><b>Validate choice</b><small>Review four checks</small></button>
+      <button class="step" data-step="decision" disabled><span>4</span><b>Record decision</b><small>Save your report</small></button>
+    </nav>
+    <div class="sidebar-note"><b>Four checks only</b><span>Existing use · Domain · Affordability · Trademark</span></div>
+  </aside>
+
+  <div class="app-area">
+    <header class="topbar">
+      <button id="menu-toggle" class="icon-button mobile-only" aria-label="Open workflow menu" aria-expanded="false">☰</button>
+      <div><b id="project-title">New naming project</b><small id="save-status">Saved on this device</small></div>
+      <div class="top-actions">
+        <button id="resume-button" class="text-button" hidden>Resume saved project</button>
+        <button id="reset-button" class="text-button danger">Start over</button>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section id="view-brief" class="view" aria-labelledby="brief-title">
+        <p class="eyebrow">App name discovery</p>
+        <h1 id="brief-title">Start with what the app does.</h1>
+        <p class="lead">AppSpecReady.ai will recommend candidate names and organize four practical checks. You make the final decision.</p>
+        <div class="legal-note" role="note"><b>Recommendation, not legal clearance.</b> Trademark screening identifies possible conflicts; it cannot guarantee a name is legally safe.</div>
+
+        <form id="brief-form" class="surface form-card" novalidate>
+          <div class="field full">
+            <label for="app-brief">Describe the app in one or two sentences</label>
+            <textarea id="app-brief" rows="5" maxlength="600" required aria-describedby="brief-help brief-error" placeholder="Example: A follow-up assistant for solo service businesses that turns customer conversations into organized next steps."></textarea>
+            <div class="field-meta"><small id="brief-help">Focus on the user, the problem, and the desired result.</small><small id="char-count">0 / 600</small></div>
+            <p id="brief-error" class="error" role="alert" hidden>Please describe the app in at least one meaningful sentence.</p>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label for="tone">Name style</label><select id="tone"><option>Clear and professional</option><option>Warm and approachable</option><option>Bold and modern</option><option>Invented and distinctive</option></select></div>
+            <div class="field"><label for="extension">Preferred domain</label><select id="extension"><option>Either .com or .ai</option><option>Prefer .com</option><option>Prefer .ai</option></select></div>
+            <div class="field"><label for="budget">Maximum annual domain budget</label><div class="money-input"><span>$</span><input id="budget" type="number" min="10" max="5000" value="100" inputmode="numeric"></div></div>
+          </div>
+          <div class="form-footer"><span>Prototype results are labeled as mock data.</span><button class="primary" type="submit">Recommend names <span aria-hidden="true">→</span></button></div>
+        </form>
+      </section>
+
+      <section id="view-results" class="view" hidden aria-labelledby="results-title">
+        <div class="page-head"><div><p class="eyebrow">Candidate names</p><h1 id="results-title">Compare the strongest options.</h1><p class="lead compact">Every option is measured against the same four checks.</p></div><button id="edit-brief" class="secondary">Edit app description</button></div>
+        <div class="mock-banner" role="status"><b>Frontend demonstration:</b> these are simulated results. Live providers will replace them when the backend is connected.</div>
+        <div class="toolbar"><div class="filter-group" role="group" aria-label="Filter candidates"><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="clear">No failed checks</button><button class="filter" data-filter="review">Needs review</button></div><label class="sort-label">Sort <select id="sort"><option value="recommended">Recommended</option><option value="az">A–Z</option></select></label></div>
+        <div id="candidate-grid" class="candidate-grid" aria-live="polite"></div>
+        <div id="empty-results" class="empty-state" hidden><h2>No names match this filter.</h2><button class="secondary" data-filter-reset>Show all candidates</button></div>
+      </section>
+
+      <section id="view-compare" class="view" hidden aria-labelledby="compare-title">
+        <button id="back-results" class="back-button">← Back to all names</button>
+        <div class="page-head"><div><p class="eyebrow">Validate your choice</p><h1 id="compare-title">Review the evidence before deciding.</h1></div></div>
+        <div class="compare-layout">
+          <article class="surface selected-summary"><span class="recommend-badge" id="selection-badge">Selected candidate</span><h2 id="selected-name"></h2><a id="selected-domain" href="https://www.godaddy.com/domains/domain-name-search" target="_blank" rel="noopener noreferrer"></a><p id="selected-rationale"></p><button id="change-selection" class="secondary">Choose a different name</button></article>
+          <section class="surface checks-panel" aria-labelledby="checks-title"><div class="section-head"><div><p class="eyebrow">Four practical checks</p><h2 id="checks-title">What we found</h2></div><span class="mock-chip">Mock results</span></div><div id="check-list" class="check-list"></div></section>
+        </div>
+        <div class="surface decision-box"><div><h2>Ready to record this name?</h2><p id="decision-guidance">Review any cautions first. You remain responsible for buying the domain and obtaining legal advice when appropriate.</p></div><button id="finalize-button" class="primary">Record this name as my decision</button></div>
+      </section>
+
+      <section id="view-decision" class="view" hidden aria-labelledby="decision-title">
+        <div class="success-mark" aria-hidden="true">✓</div><p class="eyebrow">Founder decision recorded</p><h1 id="decision-title">Your selected app name is <span id="final-name"></span>.</h1><p class="lead">The recommendation and four screening results have been organized into a report you can save or print.</p>
+        <div class="decision-grid"><article class="surface final-card"><div><small>Selected name</small><h2 id="report-name"></h2><p id="report-domain"></p></div><span class="status-pill success">Selected</span></article><article class="surface reminder-card"><b>Before launch</b><p>Purchase the domain through your chosen registrar and consider professional trademark review before investing heavily in the brand.</p></article></div>
+        <section class="surface report-preview" aria-labelledby="report-title"><div class="section-head"><div><p class="eyebrow">Naming report</p><h2 id="report-title">Decision summary</h2></div><span id="approved-date"></span></div><div id="report-mock-warning" class="mock-banner report-warning" role="note" hidden><b>Simulated frontend results.</b> Availability, pricing, and trademark findings in this report are mock data—not live research.</div><dl id="report-checks" class="report-checks"></dl><div class="report-disclaimer" id="report-disclaimer"></div></section>
+        <div class="decision-actions"><button id="print-report" class="primary">Print or save as PDF</button><button id="download-report" class="secondary">Download report</button><button id="new-project" class="text-button">Start another name search</button></div>
+      </section>
+    </main>
+    <footer><span>AppSpecReady.ai</span><span>Recommendations only · Founder makes the final decision</span></footer>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

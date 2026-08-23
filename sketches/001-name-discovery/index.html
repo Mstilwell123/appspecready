@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AppSpecReady.ai — Name Discovery Mockup</title>
+<style>
+:root{
+  --navy:#14213d;--blue:#3157d5;--blue2:#2447bd;--sky:#eef4ff;--ink:#182033;
+  --muted:#687187;--line:#dce2ee;--paper:#fff;--canvas:#f4f6fa;--good:#15835d;
+  --warn:#a66216;--danger:#bd3d42;--radius:14px;--shadow:0 12px 30px rgba(25,40,76,.08)
+}
+*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font-family:Aptos,"Segoe UI",Arial,sans-serif;line-height:1.45}
+button,input,textarea{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+.sidebar{background:var(--navy);color:#fff;padding:28px 20px;display:flex;flex-direction:column;min-height:100vh}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.4px;margin-bottom:5px}.brand span{color:#8fb1ff}.brandline{color:#aebbd3;font-size:13px;margin-bottom:34px}
+.project{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);padding:13px;border-radius:11px;margin-bottom:26px}.project small{color:#aebbd3}.project strong{display:block;margin-top:3px}
+.steps{display:grid;gap:5px}.step{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;padding:10px 9px;color:#aebbd3;border-radius:9px;font-size:14px}.step b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid #52617e;font-size:12px}.step.done{color:#dfe7f8}.step.done b{background:#285748;border-color:#3f9678;color:#bff3de}.step.active{background:#fff;color:var(--navy);font-weight:700}.step.active b{background:var(--blue);border-color:var(--blue);color:#fff}.sidefoot{margin-top:auto;font-size:12px;color:#91a0bc;border-top:1px solid rgba(255,255,255,.12);padding-top:18px}
+.main{min-width:0}.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 38px}.breadcrumb{font-size:14px;color:var(--muted)}.status{font-size:13px;color:var(--good);font-weight:700}.workspace{max-width:1060px;margin:0 auto;padding:38px 42px 70px}
+.kicker{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--blue);font-weight:800}.title{font-family:Georgia,serif;font-size:38px;letter-spacing:-.8px;margin:8px 0 8px;line-height:1.08}.intro{color:var(--muted);font-size:17px;max-width:740px;margin:0 0 24px}
+.notice{background:#fff9e8;border:1px solid #efd99f;padding:11px 14px;border-radius:10px;color:#6b5526;font-size:13px;margin-bottom:24px}.notice strong{color:#44320d}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.brief{padding:24px}.label{display:block;font-size:13px;font-weight:800;margin-bottom:8px}.brief textarea{width:100%;resize:vertical;min-height:88px;border:1.5px solid #bfc9dc;border-radius:10px;padding:14px;color:var(--ink);outline:none}.brief textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(49,87,213,.12)}
+.row{display:flex;gap:12px;align-items:center;margin-top:14px}.primary,.secondary,.ghost{border-radius:9px;padding:11px 17px;font-weight:750;border:1px solid transparent}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.secondary{background:#fff;color:var(--blue);border-color:#9eb0e5}.ghost{background:transparent;color:var(--muted);border-color:var(--line)}.hint{font-size:13px;color:var(--muted)}
+.loading{display:none;margin-top:22px;padding:18px 22px}.loading.show{display:block}.pulse{height:7px;background:#e5eaf3;border-radius:99px;overflow:hidden;margin-top:11px}.pulse span{display:block;height:100%;width:65%;background:var(--blue);animation:load 1.3s infinite ease-in-out}@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(160%)}}
+.results{display:none;margin-top:28px}.results.show{display:block}.resultshead{display:flex;align-items:end;justify-content:space-between;margin-bottom:13px}.results h2{font-family:Georgia,serif;margin:0;font-size:25px}.legend{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:19px;position:relative;transition:.18s}.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.card.recommended{border:2px solid var(--blue);padding:18px}.pill{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.65px;font-weight:800;padding:4px 8px;background:var(--sky);color:var(--blue);border-radius:99px;margin-bottom:10px}.name{font-family:Georgia,serif;font-size:23px;font-weight:700;margin-bottom:4px}.domain{font-size:13px;color:var(--muted);margin-bottom:16px}.checks{display:grid;gap:9px;border-top:1px solid var(--line);padding-top:14px}.check{display:grid;grid-template-columns:19px 1fr auto;gap:7px;align-items:start;font-size:13px}.mark{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;background:var(--good);font-size:11px;font-weight:900}.mark.warn{background:var(--warn)}.check small{color:var(--muted)}.flag{font-size:11px;font-weight:800;color:var(--good)}.flag.caution{color:var(--warn)}.select{width:100%;margin-top:17px;background:#fff;color:var(--blue);border:1px solid #aab9e2;border-radius:8px;padding:9px;font-weight:750}.recommended .select{background:var(--blue);color:#fff;border-color:var(--blue)}
+.approval{display:none;margin-top:22px;padding:23px}.approval.show{display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:center}.seal{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#e4f6ef;color:var(--good);font-size:20px;font-weight:900}.approval h3{margin:0 0 3px}.approval p{margin:0;color:var(--muted);font-size:13px}.disclaimer{margin-top:14px;font-size:12px;color:var(--muted);text-align:center}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sidebar{min-height:auto}.steps,.project,.sidefoot{display:none}.topbar{padding:0 20px}.workspace{padding:28px 18px}.cards{grid-template-columns:1fr}.approval.show{grid-template-columns:42px 1fr}.approval .primary{grid-column:1/-1}.title{font-size:32px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">AppSpecReady<span>.ai</span></div>
+    <div class="brandline">Know what to build before you build it.</div>
+    <div class="project"><small>Current project</small><strong>ClientFlow Assistant</strong></div>
+    <nav class="steps" aria-label="Build-readiness stages">
+      <div class="step done"><b>✓</b><span>Goal captured</span></div>
+      <div class="step active"><b>2</b><span>Name discovery</span></div>
+      <div class="step"><b>3</b><span>Problem discovery</span></div>
+      <div class="step"><b>4</b><span>Research & viability</span></div>
+      <div class="step"><b>5</b><span>App dependencies</span></div>
+      <div class="step"><b>6</b><span>Build-ready PRD</span></div>
+    </nav>
+    <div class="sidefoot">Draft saved locally · Prototype view</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar"><div class="breadcrumb">ClientFlow Assistant / Name discovery</div><div class="status">● Draft saved</div></header>
+    <div class="workspace">
+      <div class="kicker">Stage 2 · Name discovery</div>
+      <h1 class="title">Choose a name you can actually use.</h1>
+      <p class="intro">AppSpecReady.ai recommends names and helps you research four practical questions. You review the evidence and make the final decision.</p>
+      <div class="notice"><strong>Recommendation, not legal clearance.</strong> Trademark results are an initial screen. For a high-stakes launch, consult a qualified trademark professional.</div>
+
+      <section class="panel brief">
+        <label class="label" for="concept">Describe the app in one or two sentences</label>
+        <textarea id="concept">A simple follow-up assistant for solo service businesses that turns customer conversations into organized next steps.</textarea>
+        <div class="row">
+          <button class="primary" id="discover">Recommend and check names</button>
+          <button class="ghost" id="clear">Clear</button>
+          <span class="hint">The app will suggest names, then show where to verify them.</span>
+        </div>
+      </section>
+
+      <section class="panel loading" id="loading" aria-live="polite">
+        <strong>Researching practical name options…</strong>
+        <div class="hint">Checking existing software usage, registrar availability and price, and possible trademark conflicts.</div>
+        <div class="pulse"><span></span></div>
+      </section>
+
+      <section class="results" id="results">
+        <div class="resultshead"><div><div class="kicker">Mock research results</div><h2>Three names worth considering</h2></div><div class="legend">✓ clear · ! needs review</div></div>
+        <div class="cards">
+          <article class="card recommended">
+            <div class="pill">Best fit</div><div class="name">FollowPilot</div><div class="domain">followpilot.ai</div>
+            <div class="checks">
+              <div class="check"><span class="mark">✓</span><span><b>Name availability</b><br><small>No exact software match found</small></span><span class="flag">Clear</span></div>
+              <div class="check"><span class="mark">✓</span><span><b>Domain</b><br><small>Appears available at GoDaddy</small></span><span class="flag">Available</span></div>
+              <div class="check"><span class="mark">✓</span><span><b>Affordability</b><br><small>Standard registration range</small></span><span class="flag">Affordable</span></div>
+              <div class="check"><span class="mark warn">!</span><span><b>Trademark screen</b><br><small>No exact match; review similar “Pilot” marks</small></span><span class="flag caution">Review</span></div>
+            </div>
+            <button class="select" data-name="FollowPilot" data-domain="followpilot.ai">Choose this name</button>
+          </article>
+
+          <article class="card">
+            <div class="pill">Most descriptive</div><div class="name">NextStep Desk</div><div class="domain">nextstepdesk.com</div>
+            <div class="checks">
+              <div class="check"><span class="mark">✓</span><span><b>Name availability</b><br><small>No exact software match found</small></span><span class="flag">Clear</span></div>
+              <div class="check"><span class="mark">✓</span><span><b>Domain</b><br><small>Appears available at registrar</small></span><span class="flag">Available</span></div>
+              <div class="check"><span class="mark">✓</span><span><b>Affordability</b><br><small>Standard .com price range</small></span><span class="flag">Affordable</span></div>
+              <div class="check"><span class="mark warn">!</span><span><b>Trademark screen</b><br><small>Similar business names found</small></span><span class="flag caution">Caution</span></div>
+            </div>
+            <button class="select" data-name="NextStep Desk" data-domain="nextstepdesk.com">Choose this name</button>
+          </article>
+
+          <article class="card">
+            <div class="pill">Most ownable</div><div class="name">TaskHarbor</div><div class="domain">taskharbor.ai</div>
+            <div class="checks">
+              <div class="check"><span class="mark">✓</span><span><b>Name availability</b><br><small>No exact product match found</small></span><span class="flag">Clear</span></div>
+              <div class="check"><span class="mark warn">!</span><span><b>Domain</b><br><small>Premium listing at registrar</small></span><span class="flag caution">Premium</span></div>
+              <div class="check"><span class="mark warn">!</span><span><b>Affordability</b><br><small>Above your stated budget</small></span><span class="flag caution">Expensive</span></div>
+              <div class="check"><span class="mark">✓</span><span><b>Trademark screen</b><br><small>No obvious software conflict found</small></span><span class="flag">Clear</span></div>
+            </div>
+            <button class="select" data-name="TaskHarbor" data-domain="taskharbor.ai">Choose this name</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel approval" id="approval" aria-live="polite">
+        <div class="seal">✓</div><div><h3 id="chosen">FollowPilot selected</h3><p id="chosenDetail">The founder selected followpilot.ai. Purchase and final legal review remain the founder’s responsibility.</p></div><button class="primary">Record decision & continue</button>
+      </section>
+      <p class="disclaimer">Prototype only — all names and research results shown here are fictional mock data.</p>
+    </div>
+  </main>
+</div>
+<script>
+const discover=document.getElementById('discover'),loading=document.getElementById('loading'),results=document.getElementById('results'),approval=document.getElementById('approval'),concept=document.getElementById('concept');
+discover.addEventListener('click',()=>{if(!concept.value.trim()){concept.focus();return}loading.classList.add('show');results.classList.remove('show');approval.classList.remove('show');setTimeout(()=>{loading.classList.remove('show');results.classList.add('show');results.scrollIntoView({behavior:'smooth',block:'start'})},850)});
+document.getElementById('clear').addEventListener('click',()=>{concept.value='';results.classList.remove('show');approval.classList.remove('show');concept.focus()});
+document.querySelectorAll('.select').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.card').forEach(c=>c.classList.remove('recommended'));btn.closest('.card').classList.add('recommended');document.getElementById('chosen').textContent=btn.dataset.name+' selected';document.getElementById('chosenDetail').textContent='The founder selected '+btn.dataset.domain+'. Purchase and final legal review remain the founder’s responsibility.';approval.classList.add('show');approval.scrollIntoView({behavior:'smooth',block:'center'})}));
+</script>
+</body>
+</html>
