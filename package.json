@@ -10,7 +10,8 @@
     "server": "node server/api.js",
     "server:dev": "node --watch server/api.js",
     "test": "node src/app_state.test.js && node src/frontend_structure.test.js && node src/browser_flow.test.js && node src/engine.test.js",
-    "check": "npm test && npm run build"
+    "check": "npm test && npm run build",
+    "start": "node server/api.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
