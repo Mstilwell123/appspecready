@@ -123,6 +123,7 @@ async function checkDomainsInBackground(project, apiEndpoint) {
   try {
     // Import domain check module
     const { generateDomainCandidates, checkDomainsViaAPI } = await import('./domain_check.js');
+    const { checkTrademarksViaAPI, riskLevelToCheck } = await import('./trademark_check.js');
     
     // Generate domain candidates from names
     const nameList = project.candidates.map(c => c.name);
@@ -131,9 +132,13 @@ async function checkDomainsInBackground(project, apiEndpoint) {
     // Check domains via API
     const domainResults = await checkDomainsViaAPI(domains, { endpoint: apiEndpoint });
     
-    // Update each candidate with real domain check
+    // Check trademarks via API
+    const trademarkResults = await checkTrademarksViaAPI(nameList, { endpoint: apiEndpoint });
+    
+    // Update each candidate with real domain and trademark checks
     project.candidates.forEach((candidate, index) => {
-      const domainKey = index * 2; // Each name has 2 domain options
+      // Update domain check
+      const domainKey = index * 2;
       if (domainResults.results[domainKey]) {
         const domainCheck = domainResults.results[domainKey];
         candidate.checks.domain = {
@@ -147,9 +152,23 @@ async function checkDomainsInBackground(project, apiEndpoint) {
           price: domainCheck.estimatedPrice,
         };
       }
+      
+      // Update trademark check
+      if (trademarkResults.results[index]) {
+        const tmResult = trademarkResults.results[index];
+        const tmCheck = riskLevelToCheck(tmResult.riskLevel);
+        candidate.checks.trademark = {
+          ...tmCheck,
+          source: `Trademark API (${tmResult.source})`,
+          checkedAt: now(),
+          isMock: tmResult.fallback || false,
+          conflicts: tmResult.conflicts,
+          riskLevel: tmResult.riskLevel,
+        };
+      }
     });
   } catch (e) {
-    console.warn('Background domain check failed:', e.message);
+    console.warn('Background domain/trademark check failed:', e.message);
     // Silent fail - mock checks remain
   }
 }

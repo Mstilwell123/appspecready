@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { checkDomains } from './domain_check.js';
+import { checkTrademarksUSPTO } from './trademark_check.js';
 
 dotenv.config();
 
@@ -224,6 +225,33 @@ app.post('/api/check-domains', async (req, res) => {
   }
 });
 
+// Check trademarks via USPTO TESS
+app.post('/api/check-trademarks', async (req, res) => {
+  const { names } = req.body;
+
+  if (!Array.isArray(names) || names.length === 0) {
+    return res.status(400).json({
+      error: 'names must be a non-empty array of app names',
+    });
+  }
+
+  try {
+    const result = await checkTrademarksUSPTO(names);
+    res.json({
+      ...result,
+      status: 'success',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Trademark check error:', error.message);
+    res.status(500).json({
+      error: 'Trademark check failed',
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`AppSpecReady API server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
@@ -232,6 +260,9 @@ app.listen(PORT, () => {
   );
   console.log(
     `Check domains: POST http://localhost:${PORT}/api/check-domains`
+  );
+  console.log(
+    `Check trademarks: POST http://localhost:${PORT}/api/check-trademarks`
   );
   console.log(`Gemini API configured: ${!!GEMINI_API_KEY}`);
 });
