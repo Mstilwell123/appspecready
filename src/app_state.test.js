@@ -2,7 +2,7 @@
 import {
   createNamingProject, updateBrief, generateCandidates, selectCandidate,
   getRecommendation, candidateScore, canFinalize, finalizeSelection,
-  buildReport, resetProject, updateInterview, CHECK_KEYS
+  buildReport, buildPack, resetProject, updateInterview, CHECK_KEYS
 } from './app_state.js';
 
 let pass = 0, fail = 0;
@@ -102,6 +102,20 @@ await test('report contains the brief, selected name, four checks, and disclaime
   ok(report.name, 'report has name');
   ok(report.checks.length === 4, 'report has four checks');
   ok(report.disclaimer, 'report has disclaimer');
+});
+
+// Test 8b — RED: a build pack includes the selected decision and interview context.
+await test('build pack includes a selected name, interview score, and preliminary checks', async () => {
+  let p = updateInterview(updateBrief(createNamingProject(), 'A client follow-up tool for solo service businesses.'), { 'market-clarity': 4, 'customer-willingness': 5 });
+  p = await generateCandidates(p);
+  const passable = p.candidates.find(c => !Object.values(c.checks).some(check => check.status === 'fail'));
+  p = selectCandidate(p, passable.id);
+  p = finalizeSelection(p);
+  const pack = buildPack(p);
+  ok(pack.name === passable.name, 'pack has selected name');
+  ok(pack.interview.score > 0, 'pack has interview score');
+  ok(pack.checks.length === 4, 'pack has preliminary checks');
+  ok(pack.disclaimer.includes('not legal clearance'), 'pack has disclaimer');
 });
 
 // Test 9

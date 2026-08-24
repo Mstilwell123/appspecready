@@ -16,6 +16,11 @@ Object.assign(globalThis, {
 window.scrollTo = () => {};
 window.print = () => {};
 dom.window.Element.prototype.scrollIntoView = () => {};
+let downloadedBlob = null;
+URL.createObjectURL = blob => { downloadedBlob = blob; return 'blob:build-pack-test'; };
+URL.revokeObjectURL = () => {};
+let clickedDownload = null;
+dom.window.HTMLAnchorElement.prototype.click = function click() { clickedDownload = { href: this.href, download: this.download }; };
 
 // Keep the UI-flow test deterministic: it verifies browser behavior, not Railway.
 // The production app still performs the real network call.
@@ -63,6 +68,10 @@ await test('founder can complete the naming workflow from brief to decision', as
   assert.equal(document.querySelector('#view-decision').hidden, false);
   assert.match(document.querySelector('#decision-title').textContent, /Your selected app name is/);
   assert.equal(document.querySelectorAll('#report-checks > div').length, 4);
+  document.querySelector('#download-build-pack').click();
+  assert.match(clickedDownload.download, /-build-pack\.html$/);
+  assert.equal(downloadedBlob.type, 'text/html');
+  assert.match(await downloadedBlob.text(), /AppSpecReady Build Pack v1/);
 });
 
 await test('rendered initial page has no serious or critical axe accessibility violations', async () => {

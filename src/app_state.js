@@ -249,5 +249,21 @@ export function buildReport(project) {
   };
 }
 
+export function buildPack(project) {
+  const report = buildReport(project);
+  const interview = project.interview || { answers: {}, score: 0, analyzed: 0, totalQuestions: 9, interpretation: null };
+  return {
+    title: 'AppSpecReady Build Pack',
+    brief: report.brief,
+    name: report.name,
+    domain: report.domain,
+    approvedAt: report.approvedAt,
+    checks: report.checks,
+    interview: clone(interview),
+    disclaimer: report.disclaimer,
+    containsMockData: report.containsMockData,
+  };
+}
+
 export function resetProject() { return createNamingProject(); }
 export { CHECK_KEYS, DISCLAIMER };

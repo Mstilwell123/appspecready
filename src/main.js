@@ -1,7 +1,7 @@
 import {
   createNamingProject, updateBrief, generateCandidates, selectCandidate,
   getRecommendation, candidateScore, canFinalize, finalizeSelection,
-  buildReport, resetProject, updateInterview, CHECK_KEYS
+  buildReport, buildPack, resetProject, updateInterview, CHECK_KEYS
 } from './app_state.js';
 import { INTERVIEW_QUESTIONS } from './interview.js';
 
@@ -171,6 +171,20 @@ function downloadReport() {
   const report = buildReport(project); const content = [`APPSPECREADY.AI — APP NAME DISCOVERY REPORT`,``,`App: ${report.brief}`,`Selected name: ${report.name}`,`Domain: ${report.domain}`,`Recorded: ${new Date(report.approvedAt).toLocaleString()}`,``,...report.checks.flatMap(c => [CHECK_LABELS[c.key].toUpperCase(),`${c.label}: ${c.detail}`,`Source: ${c.source}`,``]),`DISCLAIMER`,report.disclaimer].join('\r\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content], { type:'text/plain' })); a.download = `${report.name.replace(/[^a-z0-9]+/gi,'-')}-naming-report.txt`; a.click(); URL.revokeObjectURL(a.href);
 }
+function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]); }
+function downloadBuildPack() {
+  const pack = buildPack(project);
+  const answerRows = INTERVIEW_QUESTIONS.map(question => {
+    const answer = pack.interview.answers?.[question.id];
+    return `<tr><td>${escapeHtml(question.section)}</td><td>${escapeHtml(question.question)}</td><td>${answer ? `${answer}/5 — ${escapeHtml(question.scale[answer])}` : 'Not answered'}</td></tr>`;
+  }).join('');
+  const checkRows = pack.checks.map(check => `<tr><td>${escapeHtml(CHECK_LABELS[check.key])}</td><td>${escapeHtml(check.label)}</td><td>${escapeHtml(check.detail)}</td><td>${escapeHtml(check.source)}${check.isMock ? ' (preliminary/simulated)' : ''}</td></tr>`).join('');
+  const score = pack.interview.score || 0;
+  const level = pack.interview.interpretation?.level || 'Not scored';
+  const guidance = pack.interview.interpretation?.recommendation || 'Complete the interview to add planning guidance.';
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(pack.name)} — AppSpecReady Build Pack</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 24px;color:#182238;line-height:1.55}h1{color:#14213d}h2{margin-top:34px;border-bottom:2px solid #dce2ed;padding-bottom:7px}.eyebrow{font-size:12px;font-weight:bold;color:#3157d5;text-transform:uppercase;letter-spacing:.08em}.score{display:inline-block;background:#edf3ff;color:#14213d;padding:10px 14px;border-radius:8px;font-weight:bold}table{border-collapse:collapse;width:100%;margin:14px 0}th,td{border:1px solid #dce2ed;padding:10px;vertical-align:top;text-align:left}th{background:#f4f6fa}.note{background:#fff5df;border-left:4px solid #9a641b;padding:14px}.muted{color:#667086}</style></head><body><p class="eyebrow">AppSpecReady Build Pack v1</p><h1>${escapeHtml(pack.name)}</h1><p><b>Preferred domain:</b> ${escapeHtml(pack.domain)}<br><b>Founder decision recorded:</b> ${escapeHtml(new Date(pack.approvedAt).toLocaleString())}</p><h2>Product brief</h2><p>${escapeHtml(pack.brief)}</p><h2>Viability interview</h2><p class="score">Planning score: ${score}/100 · ${escapeHtml(level)}</p><p>${escapeHtml(guidance)}</p><p class="muted">${pack.interview.analyzed || 0} of ${pack.interview.totalQuestions || 9} questions answered. This is a planning aid, not a prediction of business success.</p><table><thead><tr><th>Area</th><th>Question</th><th>Founder answer</th></tr></thead><tbody>${answerRows}</tbody></table><h2>Preliminary name checks</h2><table><thead><tr><th>Check</th><th>Result</th><th>Detail</th><th>Source</th></tr></thead><tbody>${checkRows}</tbody></table>${pack.containsMockData ? '<p class="note"><b>Important:</b> One or more check results are preliminary or simulated. Verify domains with a registrar and obtain qualified legal advice before relying on a trademark conclusion.</p>' : ''}<h2>Founder responsibility</h2><p>${escapeHtml(pack.disclaimer)}</p></body></html>`;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([html], { type:'text/html' })); a.download = `${pack.name.replace(/[^a-z0-9]+/gi,'-')}-build-pack.html`; a.click(); URL.revokeObjectURL(a.href);
+}
 
 $('app-brief').addEventListener('input', updateCount);
 $('brief-form').addEventListener('submit', async (event) => { 
@@ -198,7 +212,7 @@ $('edit-brief').addEventListener('click', () => showView('brief'));
 $('back-results').addEventListener('click', () => { renderCandidates(); showView('results'); });
 $('change-selection').addEventListener('click', () => { renderCandidates(); showView('results'); });
 $('finalize-button').addEventListener('click', () => { project = finalizeSelection(project); persist(); renderDecision(); showView('decision'); toast('Founder naming decision recorded.'); });
-$('print-report').addEventListener('click', () => window.print()); $('download-report').addEventListener('click', downloadReport);
+$('print-report').addEventListener('click', () => window.print()); $('download-report').addEventListener('click', downloadReport); $('download-build-pack').addEventListener('click', downloadBuildPack);
 ['new-project','reset-button'].forEach(id => $(id).addEventListener('click', () => { if (!confirm('Start over and remove the saved naming project from this device?')) return; project = resetProject(); try { localStorage.removeItem(STORAGE_KEY); } catch {} savedProject = null; $('resume-button').hidden = true; $('app-brief').value=''; updateCount(); showView('brief'); toast('Naming project cleared.'); }));
 $('resume-button').addEventListener('click', () => { restoreProject(savedProject); $('resume-button').hidden = true; toast('Saved naming project restored.'); });
 $('menu-toggle').addEventListener('click', () => { const side=document.querySelector('.sidebar'); const open=side.classList.toggle('open'); $('menu-toggle').setAttribute('aria-expanded',String(open)); });
