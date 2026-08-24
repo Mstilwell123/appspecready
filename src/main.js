@@ -133,8 +133,8 @@ $('brief-form').addEventListener('submit', async (event) => {
   $('generate-status').textContent = 'Generating names...';
   project = updateBrief(project, brief, { tone:$('tone').value, extension:$('extension').value, maxAnnualPrice:Number($('budget').value) || 100 }); 
   project = await generateCandidates(project, { 
-    endpoint: 'http://localhost:3001/api/generate-names' 
-  }); // Now async
+    endpoint: 'https://web-production-e3722.up.railway.app/api/generate-names' 
+  }); // Now async, calls production server
   persist(); 
   renderCandidates(); 
   showView('results'); 
