@@ -44,6 +44,13 @@ await test('founder can complete the naming workflow from brief to decision', as
   document.querySelector('#brief-form').dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true }));
   // Wait for async name generation to complete
   await new Promise(resolve => setTimeout(resolve, 100));
+  assert.equal(document.querySelectorAll('#interview-questions fieldset').length, 9);
+  const firstInterviewAnswer = document.querySelector('input[name="interview-market-clarity"][value="4"]');
+  firstInterviewAnswer.checked = true;
+  firstInterviewAnswer.dispatchEvent(new window.Event('change', { bubbles: true }));
+  assert.match(document.querySelector('#interview-progress').textContent, /1 of 9 answered/);
+  assert.match(document.querySelector('#interview-score').textContent, /\/100/);
+
   assert.equal(document.querySelector('#view-results').hidden, false);
   assert.equal(document.querySelectorAll('.candidate-card').length, 6);
   const usableCard = [...document.querySelectorAll('.candidate-card')].find(card => !card.querySelector('.mini-check.fail'));

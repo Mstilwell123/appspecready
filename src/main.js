@@ -1,8 +1,9 @@
 import {
   createNamingProject, updateBrief, generateCandidates, selectCandidate,
   getRecommendation, candidateScore, canFinalize, finalizeSelection,
-  buildReport, resetProject, CHECK_KEYS
+  buildReport, resetProject, updateInterview, CHECK_KEYS
 } from './app_state.js';
+import { INTERVIEW_QUESTIONS } from './interview.js';
 
 const STORAGE_KEY = 'appspecready.naming-project.v1';
 const CHECK_LABELS = { availability: 'Existing name usage', domain: 'Domain availability', affordability: 'Domain affordability', trademark: 'Trademark screen' };
@@ -29,6 +30,54 @@ function persist() {
 function toast(message) { const el = $('toast'); el.textContent = message; el.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => { el.hidden = true; }, 2600); }
 function icon(status) { return status === 'pass' ? '✓' : status === 'fail' ? '×' : '!'; }
 function safeText(el, text) { el.textContent = String(text ?? ''); }
+
+function renderInterview() {
+  const container = $('interview-questions');
+  if (!container) return;
+  const answers = project.interview?.answers || {};
+  container.replaceChildren();
+  INTERVIEW_QUESTIONS.forEach((question, index) => {
+    const fieldset = document.createElement('fieldset');
+    fieldset.className = 'interview-question';
+    const legend = document.createElement('legend');
+    legend.textContent = `${index + 1}. ${question.question}`;
+    const hint = document.createElement('p');
+    hint.className = 'interview-hint';
+    hint.textContent = question.hint;
+    const choices = document.createElement('div');
+    choices.className = 'interview-choices';
+    Object.entries(question.scale).forEach(([value, label]) => {
+      const choice = document.createElement('label');
+      choice.className = 'interview-choice';
+      const input = document.createElement('input');
+      input.type = 'radio'; input.name = `interview-${question.id}`; input.value = value;
+      input.checked = Number(answers[question.id]) === Number(value);
+      input.addEventListener('change', () => {
+        project = updateInterview(project, { [question.id]: Number(value) });
+        persist();
+        renderInterviewSummary();
+      });
+      const copy = document.createElement('span');
+      copy.textContent = `${value} — ${label}`;
+      choice.append(input, copy); choices.append(choice);
+    });
+    fieldset.append(legend, hint, choices); container.append(fieldset);
+  });
+  renderInterviewSummary();
+}
+
+function renderInterviewSummary() {
+  const interview = project.interview || { analyzed: 0, totalQuestions: 9, score: 0, interpretation: null };
+  safeText($('interview-progress'), `${interview.analyzed || 0} of ${interview.totalQuestions || 9} answered`);
+  if (!interview.analyzed) {
+    safeText($('interview-score'), 'Not scored yet');
+    safeText($('interview-guidance'), 'Choose one answer for each question to see a weighted planning score.');
+    return;
+  }
+  const interpretation = interview.interpretation || {};
+  safeText($('interview-score'), `${interview.score}/100 · ${interpretation.level || 'In progress'}`);
+  safeText($('interview-guidance'), `${interpretation.emoji || '•'} ${interpretation.recommendation || 'Complete more questions for guidance.'}`);
+}
 
 function showView(stage, { focus = true } = {}) {
   views.forEach(name => { $(`view-${name}`).hidden = name !== stage; });
@@ -110,7 +159,10 @@ function renderDecision() {
 }
 
 function restoreProject(saved) {
-  project = structuredClone(saved); $('app-brief').value = project.brief || ''; $('tone').value = project.preferences?.tone || 'Clear and professional'; $('extension').value = project.preferences?.extension || 'Either .com or .ai'; $('budget').value = project.preferences?.maxAnnualPrice || 100; updateCount();
+  project = structuredClone(saved);
+  if (!project.interview) project = updateInterview(project, {});
+  $('app-brief').value = project.brief || ''; $('tone').value = project.preferences?.tone || 'Clear and professional'; $('extension').value = project.preferences?.extension || 'Either .com or .ai'; $('budget').value = project.preferences?.maxAnnualPrice || 100; updateCount();
+  renderInterview();
   if (project.stage === 'results') renderCandidates(); if (project.stage === 'compare') { renderCandidates(); renderCompare(); } if (project.stage === 'decision') { renderCandidates(); renderDecision(); }
   showView(project.stage || 'brief'); persist();
 }
@@ -156,6 +208,6 @@ document.querySelector('[data-filter-reset]').addEventListener('click', () => { 
 $('sort').addEventListener('change', renderCandidates);
 document.querySelectorAll('.step').forEach(step => step.addEventListener('click', () => { if (!step.disabled) { if (step.dataset.step==='results') renderCandidates(); if(step.dataset.step==='compare') renderCompare(); if(step.dataset.step==='decision') renderDecision(); showView(step.dataset.step); } }));
 
-updateCount(); showView('brief', { focus:false });
+updateCount(); renderInterview(); showView('brief', { focus:false });
 renderFilterState();
 if (savedProject?.brief) $('resume-button').hidden = false;

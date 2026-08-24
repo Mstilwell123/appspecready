@@ -2,7 +2,7 @@
 import {
   createNamingProject, updateBrief, generateCandidates, selectCandidate,
   getRecommendation, candidateScore, canFinalize, finalizeSelection,
-  buildReport, resetProject, CHECK_KEYS
+  buildReport, resetProject, updateInterview, CHECK_KEYS
 } from './app_state.js';
 
 let pass = 0, fail = 0;
@@ -25,6 +25,14 @@ await test('new project begins with an empty brief and no invented results', asy
   const p = createNamingProject();
   ok(p.brief === '', 'brief is empty');
   ok(p.candidates.length === 0, 'no candidates yet');
+});
+
+// Test 1b — RED: interview answers and score belong in the saved project.
+await test('interview answers and viability score are saved in the project', async () => {
+  const p = updateInterview(createNamingProject(), { 'market-clarity': 4, 'customer-willingness': 5 });
+  ok(p.interview.answers['market-clarity'] === 4, 'stores interview answer');
+  ok(p.interview.score > 0, 'calculates viability score');
+  ok(p.interview.analyzed === 2, 'tracks answered question count');
 });
 
 // Test 2

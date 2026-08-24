@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "server": "node server/api.js",
     "server:dev": "node --watch server/api.js",
-    "test": "node src/app_state.test.js && node src/frontend_structure.test.js && node src/browser_flow.test.js && node src/engine.test.js",
+    "test": "node src/app_state.test.js && node src/interview.test.js && node src/frontend_structure.test.js && node src/browser_flow.test.js && node src/engine.test.js",
     "check": "npm test && npm run build",
     "start": "node server/api.js"
   },

@@ -1,3 +1,5 @@
+import { scoreInterview } from './interview.js';
+
 const CHECK_KEYS = ['availability', 'domain', 'affordability', 'trademark'];
 const DISCLAIMER = 'AppSpecReady.ai provides recommendations and preliminary trademark screening, not legal clearance. The founder makes the final decision and should consult a qualified trademark professional for high-stakes use.';
 
@@ -55,6 +57,7 @@ export function createNamingProject() {
     stage: 'brief',
     brief: '',
     preferences: { tone: 'Clear and professional', extension: 'Either .com or .ai', maxAnnualPrice: 100 },
+    interview: { answers: {}, score: 0, analyzed: 0, totalQuestions: 9, interpretation: null, updatedAt: null },
     candidates: [],
     selectedCandidateId: null,
     finalDecision: null,
@@ -67,6 +70,22 @@ export function updateBrief(project, brief, preferences = {}) {
   const p = clone(project);
   p.brief = String(brief || '').trim();
   p.preferences = { ...p.preferences, ...preferences };
+  p.updatedAt = now();
+  return p;
+}
+
+export function updateInterview(project, answers = {}) {
+  const p = clone(project);
+  const normalized = { ...(p.interview?.answers || {}), ...answers };
+  const result = scoreInterview(normalized);
+  p.interview = {
+    answers: normalized,
+    score: result.score,
+    analyzed: result.analyzed,
+    totalQuestions: result.totalQuestions,
+    interpretation: result.interpretation,
+    updatedAt: result.timestamp,
+  };
   p.updatedAt = now();
   return p;
 }
