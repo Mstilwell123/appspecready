@@ -111,7 +111,47 @@ export async function generateCandidates(project, nameProvider = null) {
   p.finalDecision = null;
   p.stage = 'results';
   p.updatedAt = now();
+  
+  // Async: Check domains in background (don't block on this)
+  // This will update domain checks when results come back
+  checkDomainsInBackground(p, nameProvider?.endpoint);
+  
   return p;
+}
+
+async function checkDomainsInBackground(project, apiEndpoint) {
+  try {
+    // Import domain check module
+    const { generateDomainCandidates, checkDomainsViaAPI } = await import('./domain_check.js');
+    
+    // Generate domain candidates from names
+    const nameList = project.candidates.map(c => c.name);
+    const domains = generateDomainCandidates(nameList, project.preferences.extension);
+    
+    // Check domains via API
+    const domainResults = await checkDomainsViaAPI(domains, { endpoint: apiEndpoint });
+    
+    // Update each candidate with real domain check
+    project.candidates.forEach((candidate, index) => {
+      const domainKey = index * 2; // Each name has 2 domain options
+      if (domainResults.results[domainKey]) {
+        const domainCheck = domainResults.results[domainKey];
+        candidate.checks.domain = {
+          status: domainCheck.available ? 'pass' : 'fail',
+          label: domainCheck.available ? 'Appears available' : 'Not available',
+          detail: `${domainCheck.domain} - $${domainCheck.estimatedPrice}/year`,
+          source: `Domain API (${domainCheck.source})`,
+          checkedAt: now(),
+          isMock: domainCheck.fallback || false,
+          available: domainCheck.available,
+          price: domainCheck.estimatedPrice,
+        };
+      }
+    });
+  } catch (e) {
+    console.warn('Background domain check failed:', e.message);
+    // Silent fail - mock checks remain
+  }
 }
 
 export function updateCheck(project, candidateId, checkKey, result) {

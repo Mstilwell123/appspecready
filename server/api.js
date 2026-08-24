@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { checkDomains } from './domain_check.js';
 
 dotenv.config();
 
@@ -196,11 +197,41 @@ Generate six distinctive app names.`;
   }
 });
 
+// Check domain availability
+app.post('/api/check-domains', async (req, res) => {
+  const { domains } = req.body;
+
+  if (!Array.isArray(domains) || domains.length === 0) {
+    return res.status(400).json({
+      error: 'domains must be a non-empty array of domain names',
+    });
+  }
+
+  try {
+    const result = await checkDomains(domains);
+    res.json({
+      ...result,
+      status: 'success',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error('Domain check error:', error.message);
+    res.status(500).json({
+      error: 'Domain check failed',
+      message: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`AppSpecReady API server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(
     `Generate names: POST http://localhost:${PORT}/api/generate-names`
+  );
+  console.log(
+    `Check domains: POST http://localhost:${PORT}/api/check-domains`
   );
   console.log(`Gemini API configured: ${!!GEMINI_API_KEY}`);
 });
