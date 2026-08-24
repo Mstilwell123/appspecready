@@ -17,6 +17,18 @@ window.scrollTo = () => {};
 window.print = () => {};
 dom.window.Element.prototype.scrollIntoView = () => {};
 
+// Keep the UI-flow test deterministic: it verifies browser behavior, not Railway.
+// The production app still performs the real network call.
+globalThis.fetch = async (url) => ({
+  ok: true,
+  json: async () => String(url).includes('check-domains')
+    ? { checked: 0, available: 0, results: [] }
+    : { names: [
+      { name: 'FlowPilot' }, { name: 'ClientHarbor' }, { name: 'NextStep Desk' },
+      { name: 'TaskCurrent' }, { name: 'RelayNest' }, { name: 'PromptLedger' },
+    ], source: 'mock' },
+});
+
 await import(`./main.js?test=${Date.now()}`);
 
 let passed = 0;
